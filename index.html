@@ -1,0 +1,162 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>새싹무 | 만화</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <header class="topbar">
+    <nav aria-label="목차">
+      <a class="brand" href="#top">새싹무</a>
+      <a href="#vrchat">VRChat 만화</a>
+      <a href="#bluearchive">블루아카이브 만화</a>
+      <a href="#series">공공재와 레즈퀸</a>
+    </nav>
+  </header>
+
+  <main>
+    <section id="top" data-bg="#eef5e8" style="--accent:#4c9a3a">
+      <div class="wrap">
+        <div class="profile">
+          <img class="avatar" src="profile.jpg" alt="새싹무 프로필 일러스트" width="200" height="200">
+          <div class="who">
+            <p class="label">COMIC ARTIST</p>
+            <h1>새싹무</h1>
+            <p class="desc">망상을 그리는 떠돌이 그림쟁이 <br> 트위터(X)에 귀엽고 야한 만화를 위주로 그리고 있어요.</p>
+            <div class="links">
+              <a class="btn" href="https://x.com/radish_vrc" target="_blank" rel="noopener">X @radish_vrc</a>
+              <a class="btn ghost" href="https://www.postype.com/@leafradish" target="_blank" rel="noopener">포스타입 전체 작품</a>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <section id="vrchat" class="side" data-bg="#e8eefb" style="--accent:#5b6df0; --img:url(bg-vrchat.webp)">
+      <div class="wrap">
+        <p class="label">01 / 03</p>
+        <h2>VRChat 만화</h2>
+        <p class="desc">이 폴리곤덩어리 세계에서 잃어버린 무언가를 찾았습니까? <br> VRChat을 시작한 멘헤라 코코나가 겪는 이야기</p>
+        <div class="links"><a class="btn" href="https://www.postype.com/@leafradish/series/1585098" target="_blank" rel="noopener">포스타입에서 보기</a></div>
+      </div>
+    </section>
+
+    <section id="bluearchive" data-bg="#e1f1fb" style="--accent:#1f8fe8; --img:url(bg-bluearchive.jpg)">
+      <div class="wrap">
+        <p class="label">02 / 03</p>
+        <h2>블루아카이브 2차창작</h2>
+        <p class="desc">블루아카이브 창작 모음입니다.</p>
+        <div class="links"><a class="btn" href="https://www.postype.com/@leafradish/series/1262348" target="_blank" rel="noopener">포스타입에서 보기</a></div>
+      </div>
+    </section>
+
+    <section id="series" data-bg="#fbe8f1" style="--accent:#e2578f; --img:url(bg-series.jpg)">
+      <div class="wrap">
+        <p class="label">03 / 03</p>
+        <h2>공공재와 레즈퀸</h2>
+        <p class="desc">공공재는 레즈퀸의 꿈을 꾸나요?</p>
+        <div class="links"><a class="btn" href="https://www.postype.com/@leafradish/series/729127" target="_blank" rel="noopener">포스타입에서 보기</a></div>
+      </div>
+    </section>
+  </main>
+
+  <nav class="dots" aria-label="페이지 이동">
+    <a href="#top" aria-label="소개"></a>
+    <a href="#vrchat" aria-label="VRChat 만화"></a>
+    <a href="#bluearchive" aria-label="블루아카이브 2차창작"></a>
+    <a href="#series" aria-label="공공재와 레즈퀸"></a>
+  </nav>
+
+  <script>
+  (function () {
+    var root = document.documentElement, bar = document.querySelector('.topbar');
+    var pages = [].slice.call(document.querySelectorAll('main > section'));
+    var dots = [].slice.call(document.querySelectorAll('.dots a'));
+    var reduce = matchMedia('(prefers-reduced-motion: reduce)').matches;
+    var DUR = 1100, lockStart = 0, lockUntil = 0, ticking = false, anim = 0;
+
+    root.classList.add('js');
+    function setBar() { root.style.setProperty('--bar', bar.offsetHeight + 'px'); }
+    setBar(); addEventListener('resize', setBar);
+
+    function current() {
+      var b = bar.offsetHeight, y = b + (innerHeight - b) / 2;
+      for (var i = 0; i < pages.length; i++) {
+        var r = pages[i].getBoundingClientRect();
+        if (r.top <= y && y < r.bottom) return i;
+      }
+      return 0;
+    }
+    function animateTo(to) {
+      cancelAnimationFrame(anim);
+      to = Math.max(0, Math.min(to, root.scrollHeight - innerHeight));
+      var from = scrollY, dist = to - from, t0 = performance.now();
+      if (reduce || !dist) { scrollTo({ top: to, behavior: 'instant' }); return; }
+      function step(t) {
+        var p = Math.min((t - t0) / DUR, 1);
+        var e = p < 0.5 ? 4 * p * p * p : 1 - Math.pow(-2 * p + 2, 3) / 2;
+        scrollTo({ top: from + dist * e, behavior: 'instant' });
+        if (p < 1) anim = requestAnimationFrame(step);
+      }
+      anim = requestAnimationFrame(step);
+    }
+    function goTo(i, dir) {
+      var r = pages[i].getBoundingClientRect(), b = bar.offsetHeight;
+      animateTo((dir < 0 && r.height > innerHeight - b) ? scrollY + r.bottom - innerHeight : scrollY + r.top - b);
+    }
+
+    // 휠 한 번에 페이지 하나씩 이동
+    addEventListener('wheel', function (e) {
+      if (e.ctrlKey || e.deltaY === 0 || Math.abs(e.deltaX) > Math.abs(e.deltaY)) return;
+      var now = Date.now();
+      if (now < lockUntil) {
+        e.preventDefault();
+        lockUntil = Math.min(Math.max(lockUntil, now + 100), lockStart + DUR + 900);
+        return;
+      }
+      var dir = e.deltaY > 0 ? 1 : -1, i = current();
+      var r = pages[i].getBoundingClientRect(), b = bar.offsetHeight;
+      if (dir > 0 && (r.bottom > innerHeight + 2 || i === pages.length - 1)) return;
+      if (dir < 0 && (r.top < b - 2 || i === 0)) return;
+      e.preventDefault();
+      lockStart = now; lockUntil = now + DUR + 100;
+      goTo(i + dir, dir);
+    }, { passive: false });
+
+    // 메뉴·점 클릭도 같은 속도로 이동
+    document.addEventListener('click', function (e) {
+      var a = e.target.closest('a[href^="#"]');
+      var t = a && document.querySelector(a.getAttribute('href'));
+      if (!t) return;
+      e.preventDefault();
+      lockStart = Date.now(); lockUntil = lockStart + DUR + 100;
+      animateTo(scrollY + t.getBoundingClientRect().top - bar.offsetHeight);
+    });
+    ['touchstart', 'keydown'].forEach(function (n) {
+      addEventListener(n, function () { cancelAnimationFrame(anim); }, { passive: true });
+    });
+
+    // 현재 페이지 표시 + 배경색 전환
+    function mark() {
+      var c = current();
+      document.body.style.backgroundColor = pages[c].getAttribute('data-bg');
+      dots.forEach(function (d, k) {
+        d.classList.toggle('on', k === c);
+        if (k === c) d.setAttribute('aria-current', 'true'); else d.removeAttribute('aria-current');
+      });
+      ticking = false;
+    }
+    addEventListener('scroll', function () { if (!ticking) { ticking = true; requestAnimationFrame(mark); } }, { passive: true });
+    mark();
+
+    // 페이지가 나타나는 효과
+    var io = new IntersectionObserver(function (entries) {
+      entries.forEach(function (en) { if (en.isIntersecting) en.target.classList.add('in'); });
+    }, { threshold: 0.1 });
+    pages.forEach(function (p) { io.observe(p); });
+  })();
+  </script>
+</body>
+</html>

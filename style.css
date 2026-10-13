@@ -1,0 +1,106 @@
+:root {
+  --bg: #eef5e8;
+  --ink: #18212b;
+  --muted: #4d5a68;
+  --line: #d3dacd;
+  --bar: 58px;
+}
+* { box-sizing: border-box; }
+html { scroll-padding-top: var(--bar); overflow-x: hidden; }
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--ink);
+  font: 16px/1.75 "Pretendard", "Noto Sans KR", "Malgun Gothic", "Apple SD Gothic Neo", sans-serif;
+  -webkit-font-smoothing: antialiased;
+  transition: background-color .9s ease;
+}
+a { color: inherit; }
+:focus-visible { outline: 3px solid var(--ink); outline-offset: 3px; }
+
+/* 상단 바 */
+.topbar { position: sticky; top: 0; z-index: 10; background: rgba(255,255,255,.88); backdrop-filter: blur(8px); border-bottom: 1px solid var(--line); }
+.topbar nav { max-width: 880px; margin: 0 auto; padding: 0 24px; display: flex; align-items: center; gap: 28px; overflow-x: auto; }
+.topbar a { display: block; padding: 16px 0 13px; font-weight: 600; font-size: 15px; color: var(--muted); text-decoration: none; border-bottom: 3px solid transparent; white-space: nowrap; }
+.topbar a:hover { color: var(--ink); border-bottom-color: var(--ink); }
+.topbar .brand { margin-right: auto; color: var(--ink); font-weight: 800; font-size: 17px; }
+
+/* 페이지 */
+section {
+  position: relative;
+  isolation: isolate;
+  min-height: calc(100vh - var(--bar));
+  display: flex;
+  align-items: center;
+}
+section::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  background: var(--img) no-repeat center / cover;
+  mix-blend-mode: multiply;   /* 흰 배경은 사라지고 그림만 배경색에 스며듦 */
+  opacity: .32;
+}
+section.side::before {        /* 세로로 긴 그림: 오른쪽에 전체가 보이게 */
+  background-size: auto 100%;
+  background-position: right center;
+  -webkit-mask-image: linear-gradient(to left, #000 55%, transparent);
+  mask-image: linear-gradient(to left, #000 55%, transparent);
+}
+.wrap { width: 100%; max-width: 880px; margin: 0 auto; padding: 56px 24px; }
+
+.label { margin: 0 0 8px; color: var(--accent); font-weight: 800; letter-spacing: .06em; font-size: 14px; }
+h1, h2 { margin: 0 0 16px; font-size: clamp(38px, 7vw, 68px); line-height: 1.15; letter-spacing: -0.02em; font-weight: 800; }
+.desc { margin: 0 0 28px; max-width: 480px; color: var(--muted); font-size: 18px; }
+.links { display: flex; flex-wrap: wrap; gap: 12px; }
+.btn { display: inline-block; padding: 12px 22px; border-radius: 999px; background: var(--ink); color: #fff; font-weight: 700; text-decoration: none; border: 2px solid var(--ink); transition: background .2s, border-color .2s, color .2s; }
+.btn:hover { background: var(--accent); border-color: var(--accent); }
+.btn.ghost { background: transparent; color: var(--ink); }
+.btn.ghost:hover { background: var(--ink); border-color: var(--ink); color: #fff; }
+
+/* 오른쪽 페이지 표시 */
+.dots { position: fixed; right: 20px; top: 50%; transform: translateY(-50%); z-index: 10; display: flex; flex-direction: column; gap: 6px; }
+.dots a { display: block; width: 24px; height: 24px; position: relative; }
+.dots a::after { content: ""; position: absolute; inset: 7px; border: 2px solid var(--muted); border-radius: 50%; transition: background .2s, transform .2s; }
+.dots a.on::after { background: var(--ink); border-color: var(--ink); transform: scale(1.25); }
+
+/* 나타나는 효과 (JS가 켜져 있을 때만) */
+html.js section::before { opacity: 0; transition: opacity 1s ease; }
+html.js section.in::before { opacity: .32; }
+html.js .wrap > * { opacity: 0; transform: translateY(28px); transition: opacity .6s ease, transform .6s ease; }
+html.js section.in .wrap > * { opacity: 1; transform: none; }
+html.js section.in .wrap > :nth-child(2) { transition-delay: .08s; }
+html.js section.in .wrap > :nth-child(3) { transition-delay: .16s; }
+html.js section.in .wrap > :nth-child(4) { transition-delay: .24s; }
+
+@media (max-width: 900px) { .dots { display: none; } }
+@media (max-width: 700px) {
+  section.side::before { -webkit-mask-image: none; mask-image: none; opacity: .2; background-position: right bottom; }
+  html.js section.side.in::before { opacity: .2; }
+}
+@media (prefers-reduced-motion: reduce) {
+  body, html.js section::before, html.js .wrap > * { transition: none; }
+  html.js .wrap > * { opacity: 1; transform: none; }
+}
+
+/* 배경이 투명한 PNG는 원래 색 그대로 얹음 */
+section.side::before { mix-blend-mode: normal; }
+
+/* 프로필 */
+.profile { display: flex; align-items: center; gap: 48px; }
+.avatar {
+  flex: none;
+  width: 200px;
+  height: 200px;
+  border-radius: 50%;
+  object-fit: cover;
+  background: #fff;
+  border: 4px solid #fff;
+  box-shadow: 0 6px 24px rgba(24, 33, 43, .15);
+}
+.who { min-width: 0; }
+@media (max-width: 700px) {
+  .profile { flex-direction: column; align-items: flex-start; gap: 24px; }
+  .avatar { width: 140px; height: 140px; }
+}
